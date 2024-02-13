@@ -3,7 +3,9 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.config.security.MyLoginUser;
@@ -102,14 +104,22 @@ public class BoardController {
     }
 
 
-@GetMapping("/")
-public String index(HttpServletRequest request, @AuthenticationPrincipal MyLoginUser myLoginUser) {
-    System.out.println("로그인 되었나? : "+myLoginUser.getUsername());
-    List<Board> boardList = boardRepository.findAll();
-    request.setAttribute("boardList", boardList);
+    @GetMapping("/")
+    public String index(HttpServletRequest request, @AuthenticationPrincipal MyLoginUser myLoginUser) {
+        System.out.println("로그인 되었나? : " + myLoginUser.getUsername());
 
-    return "index";
-}
+        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        Authentication authentication = securityContext.getAuthentication();
+        MyLoginUser temp = (MyLoginUser) authentication.getPrincipal();
+        User user = temp.getUser();
+        System.out.println("직접 접근 : "+user.getUsername());
+
+
+        List<Board> boardList = boardRepository.findAll();
+        request.setAttribute("boardList", boardList);
+
+        return "index";
+    }
 
     //   /board/saveForm 요청(Get)이 온다
     @GetMapping("/board/saveForm")
