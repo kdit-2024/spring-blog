@@ -3,8 +3,10 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import shop.mtcoding.blog._core.config.security.MyLoginUser;
 import shop.mtcoding.blog.user.User;
 
 import java.util.HashMap;
@@ -20,16 +22,13 @@ public class BoardController {
     // ?title=제목1&content=내용1
     // title=제목1&content=내용1
     @PostMapping("/board/{id}/update")
-    public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO){
+    public String update(@PathVariable int id, BoardRequest.UpdateDTO requestDTO) {
         // 1. 인증 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if(sessionUser == null){
-            return "redirect:/loginForm";
-        }
 
         // 2. 권한 체크
         Board board = boardRepository.findById(id);
-        if(board.getUserId() != sessionUser.getId()){
+        if (board.getUserId() != sessionUser.getId()) {
             return "error/403";
         }
 
@@ -37,23 +36,20 @@ public class BoardController {
         // update board_tb set title = ?, content = ? where id = ?;
         boardRepository.update(requestDTO, id);
 
-        return "redirect:/board/"+id;
+        return "redirect:/board/" + id;
     }
 
 
     @GetMapping("/board/{id}/updateForm")
-    public String updateForm(@PathVariable int id, HttpServletRequest request){
+    public String updateForm(@PathVariable int id, HttpServletRequest request) {
         // 1. 인증 안되면 나가
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if(sessionUser == null){
-            return "redirect:/loginForm";
-        }
 
         // 2. 권한 없으면 나가
         // 모델 위임 (id로 board를 조회)
         Board board = boardRepository.findById(id);
 
-        if(board.getUserId() != sessionUser.getId()){
+        if (board.getUserId() != sessionUser.getId()) {
             return "error/403";
         }
 
@@ -68,13 +64,9 @@ public class BoardController {
     public String delete(@PathVariable int id, HttpServletRequest request) {
         // 1. 인증 안되면 나가
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) { // 401
-            return "redirect:/loginForm";
-        }
 
         // 2. 권한 없으면 나가
         Board board = boardRepository.findById(id);
-
 
         if (board.getUserId() != sessionUser.getId()) {
             request.setAttribute("status", 403);
@@ -92,9 +84,6 @@ public class BoardController {
     public String save(BoardRequest.SaveDTO requestDTO, HttpServletRequest request) {
         // 1. 인증 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
 
         // 2. 바디 데이터 확인 및 유효성 검사
         System.out.println(requestDTO);
@@ -113,14 +102,14 @@ public class BoardController {
     }
 
 
-    @GetMapping({"/", "/board"})
-    public String index(HttpServletRequest request) {
+@GetMapping("/")
+public String index(HttpServletRequest request, @AuthenticationPrincipal MyLoginUser myLoginUser) {
+    System.out.println("로그인 되었나? : "+myLoginUser.getUsername());
+    List<Board> boardList = boardRepository.findAll();
+    request.setAttribute("boardList", boardList);
 
-        List<Board> boardList = boardRepository.findAll();
-        request.setAttribute("boardList", boardList);
-
-        return "index";
-    }
+    return "index";
+}
 
     //   /board/saveForm 요청(Get)이 온다
     @GetMapping("/board/saveForm")
@@ -129,11 +118,6 @@ public class BoardController {
         //   session 영역에 sessionUser 키값에 user 객체 있는지 체크
         User sessionUser = (User) session.getAttribute("sessionUser");
 
-        //   값이 null 이면 로그인 페이지로 리다이렉션
-        //   값이 null 이 아니면, /board/saveForm 으로 이동
-        if (sessionUser == null) {
-            return "redirect:/loginForm";
-        }
         return "board/saveForm";
     }
 
