@@ -13,7 +13,7 @@ public class Board { // User 1 -> Board N
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 전략
     private int id;
 
-    @Column(length = 30)
+    //@Column(length = 30)
     private String title;
     private String content;
 

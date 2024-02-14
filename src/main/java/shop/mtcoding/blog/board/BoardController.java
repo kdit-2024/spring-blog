@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.config.security.MyLoginUser;
 import shop.mtcoding.blog.user.User;
@@ -80,11 +81,11 @@ public class BoardController {
         // 2. 바디 데이터 확인 및 유효성 검사
         System.out.println(requestDTO);
 
-        if (requestDTO.getTitle().length() > 30) {
-            request.setAttribute("status", 400);
-            request.setAttribute("msg", "title의 길이가 30자를 초과해서는 안되요");
-            return "error/40x"; // BadRequest
-        }
+//        if (requestDTO.getTitle().length() > 30) {
+//            request.setAttribute("status", 400);
+//            request.setAttribute("msg", "title의 길이가 30자를 초과해서는 안되요");
+//            return "error/40x"; // BadRequest
+//        }
 
         // 3. 모델 위임
         // insert into board_tb(title, content, user_id, created_at) values(?,?,?, now());
@@ -97,6 +98,7 @@ public class BoardController {
     @GetMapping("/")
     public String index(HttpServletRequest request) {
         List<Board> boardList = boardRepository.findAll();
+        
         request.setAttribute("boardList", boardList);
 
         return "index";
