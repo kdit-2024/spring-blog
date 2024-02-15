@@ -2,8 +2,10 @@ package shop.mtcoding.blog.board;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import shop.mtcoding.blog.reply.Reply;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name="board_tb")
 @Data
@@ -20,4 +22,6 @@ public class Board { // User 1 -> Board N
     private int userId; // 테이블에 만들어 질때 user_id
 
     private LocalDateTime createdAt;
+
+
 }

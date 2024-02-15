@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog.user.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -112,14 +113,23 @@ public class BoardController {
         return "redirect:/";
     }
 
+    @GetMapping("/test")
+    public @ResponseBody List<BoardResponse.MainDTO> index2(HttpServletRequest request) {
 
-    @GetMapping({"/", "/board"})
-    public String index(HttpServletRequest request) {
+        return boardRepository.findAllV3();
 
-        List<Board> boardList = boardRepository.findAll();
-        request.setAttribute("boardList", boardList);
+    }
 
-        return "index";
+    @GetMapping("/")
+    public @ResponseBody List<BoardResponse.BoardDTO> index(HttpServletRequest request) {
+
+        //List<Board> boardList = boardRepository.findAll();
+        //request.setAttribute("boardList", boardList);
+
+        //return "index";
+
+        return boardRepository.findAllV2();
+
     }
 
     //   /board/saveForm 요청(Get)이 온다
