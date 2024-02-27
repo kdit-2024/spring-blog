@@ -42,8 +42,8 @@ public class LoveController {
             return new ApiUtil<>(401, "인증안됨");
         }
 
-        int loveId = loveRepository.save(requestDTO, sessionUser.getId());
-        return new ApiUtil<>(loveId);
+        Love love = loveRepository.save(requestDTO, sessionUser.getId());
+        return new ApiUtil<>(love);
     }
 }
 
